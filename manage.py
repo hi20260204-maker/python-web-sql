@@ -12,15 +12,18 @@ class Database:
             )
         self.cursor = self.conn.cursor()
 
-    #SELECT 쿼리
+    #유저의 내용을 DB에서 꺼내옴 if 없으면?
     def get_user(self):
         try:
             select_query = "SELECT * FROM users"
-            self.cursor.execute("SELECT * FROM users")
+            self.cursor.execute(select_query)
         return self.cursor.fetchall()
     
     #INSERT 쿼리
-    def set_user(self)
+    def set_user(self, p_name):
+        insert_query = "INSERT INTO users VALUES(%S, %S)"
+        self.cursor.execute(sql, (p_name))
+
 
     
     #close
