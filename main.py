@@ -1,4 +1,12 @@
+#써드파티 라이브러리
+import streamlit as st 
 
+#개인 라이브러리
+from common.go_to_pages import go_to_start
+from common.game import Game
 
 if __name__=="__main__":
-    print("HI")
+    st.title("하나빼기 게임")
+    go_to_start()
+    game = Game()
+    game.do_game()
