@@ -1,0 +1,44 @@
+services:
+  # Django 애플리케이션 서비스의 이름
+  app:
+    # 현재 디렉토리에 있는 Dockerfile로 이미지를 빌드
+    build: .
+    # 컨테이너 이름
+    container_name: app
+    # 컨테이너 실행시 수행할 명령어
+    command: >
+      sh -c  "python manage.py wait_for_db && \
+              python manage.py migrate && \
+              python manage.py runserver 0.0.0.0:8000"
+    # 로컬 프로젝트 디렉토리를 컨테이너 /app에 마운트
+    volumes:
+      - .:/app
+    # 호스트의 8000번 포트를 컨테이너의 8000번 포트로 포워딩
+    ports:
+      - "8000:8000"
+    # db 서비스가 먼저 시작되도록 의존성 설정
+    depends_on:
+      - db
+    env_file:
+      - .env
+  
+  # MySQL 데이터베이스 서비스의 이름
+  db:
+    # 사용할 이미지
+    image: mysql:8.0
+    # 컨테이너 재시작 정책
+    restart: always
+    env_file:
+      - .env
+    # 환경 변수 설정
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    # Mysql 데이터영속성을 위한 볼륨 설정
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data: # Mysql 데이터 저장용 named volume
