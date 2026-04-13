@@ -102,3 +102,9 @@ body::before {
 .nav-link:hover {
     color: var(--primary) !important;
 }
+
+/* Layout spacing */
+.main-container {
+    padding-top: 120px;
+    padding-bottom: 50px;
+}

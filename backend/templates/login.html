@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}로그인 - RPS Game{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-card {
+        max-width: 450px;
+        margin: 0 auto;
+        padding: 50px;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        border-radius: 12px;
+        padding: 12px 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--primary);
+        color: white;
+        box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <div class="auth-card glass-card">
+            <h2 class="fw-800 mb-4 text-center gradient-text">WELCOME BACK</h2>
+            <p class="text-center text-secondary mb-5 small">계정에 로그인하여 전세를 이어가세요.</p>
+            
+            <form method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn-premium w-100 mt-4">로그인</button>
+            </form>
+            
+            <div class="mt-5 text-center small text-secondary">
+                아직 계정이 없으신가요? <a href="{% url 'signup' %}" class="text-info fw-bold">회원가입</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Django 기본 폼 필드에 클래스 추가
+    document.querySelectorAll('input').forEach(el => el.classList.add('form-control'));
+</script>
+{% endblock %}

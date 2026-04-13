@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     "user",
     "game",
     "ranking",
-    "core",
 ]
 
 MIDDLEWARE = [

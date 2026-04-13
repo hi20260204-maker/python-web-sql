@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}회원가입 - RPS Game{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-card {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 50px;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        border-radius: 12px;
+        padding: 12px 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--primary);
+        color: white;
+        box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        color: #94a3b8;
+    }
+
+    .helptext {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: -15px;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    ul {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <div class="auth-card glass-card">
+            <h2 class="fw-800 mb-4 text-center gradient-text">JOIN THE BATTLE</h2>
+            <p class="text-center text-secondary mb-5 small">준비되셨나요? 계정을 만들고 영광의 기록을 남기세요.</p>
+            
+            <form method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="helptext">{{ field.help_text|safe }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn-premium w-100 mt-4">회원가입 완료</button>
+            </form>
+            
+            <div class="mt-5 text-center small text-secondary">
+                이미 계정이 있으신가요? <a href="{% url 'login' %}" class="text-info fw-bold">로그인</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Django 기본 폼 필드에 클래스 추가
+    document.querySelectorAll('input').forEach(el => el.classList.add('form-control'));
+</script>
+{% endblock %}

@@ -26,4 +26,7 @@ urlpatterns = [
     path('user/', user_views.index, name='user-index'),
     path('game/', game_views.index, name='game-index'),
     path('ranking/', ranking_views.index, name='ranking-index'),
+    path('signup/', user_views.signup_view, name='signup'),
+    path('login/', user_views.login_view, name='login'),
+    path('logout/', user_views.logout_view, name='logout'),
 ]

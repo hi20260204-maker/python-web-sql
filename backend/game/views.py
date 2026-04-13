@@ -10,6 +10,10 @@ def home(request):
 
 def index(request):
     if request.method == 'POST':
+        # 비로그인 유저 접근 차단
+        if not request.user.is_authenticated:
+            return redirect('login')
+            
         # 1. 사용자의 선택 가져오기
         player_choice = request.POST.get('choice') # 'R', 'P', 'S'
         
