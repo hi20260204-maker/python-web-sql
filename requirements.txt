@@ -1,0 +1,11 @@
+asgiref==3.11.1
+Django==4.2
+sqlparse==0.5.5
+tzdata==2025.3
+pymysql==1.1.0
+cryptography
+python-dotenv==1.2.2
+psycopg2-binary
+dj-database-url
+whitenoise
+gunicorn

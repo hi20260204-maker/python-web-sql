@@ -36,7 +36,8 @@
 
 ## 5. 인프라 및 배포 로드맵
 - **Container**: Docker + Docker Compose (Python 3.12 + MySQL 8.0)
-- **Production**: AWS EC2 + AWS RDS (운영 환경 권장 아키텍처)
+- **Production**: Vercel (Hosting) + Supabase (Database)
+- **Notice**: AWS 배포 및 운영은 프로젝트 고도화 단계의 향후 과제로 변경되었습니다.
 
 ## 6. Phase 6: 인증 및 접근 제어 (완료)
 - **회원가입/로그인**: `UserCreationForm` 기반의 세련된 인증 페이지 구축.
@@ -64,53 +65,44 @@ python-web-sql/
 ```
 
 ---
-*본 계획서는 프로젝트의 모든 구현 단계가 완료되어 최종 업데이트되었습니다.*
+*본 계획서는 프로젝트의 구현 목표를 Vercel + Supabase 기반의 모던 클라우드 배포로 수정하여 최종 업데이트되었습니다.*
 # 추가 할 사항
 ## 8. 외부 접근 가능한 운영 배포 구성 (Public Deployment Architecture)
 
 본 프로젝트는 로컬 개발 환경을 넘어, 외부 사용자가 인터넷을 통해 직접 접속할 수 있는 운영 서비스 형태로 배포하는 것을 목표로 합니다.
 
 ### 8.1 운영 배포 목표
-- 사용자는 브라우저를 통해 퍼블릭 URL로 서비스에 접속할 수 있어야 합니다.
-- Django 서버는 AWS 상에서 24시간 실행 가능한 상태로 운영됩니다.
-- 데이터베이스는 로컬 Docker MySQL이 아닌 AWS RDS를 사용하여 영속성과 안정성을 확보합니다.
-- 정적 파일(CSS, JS, 이미지)은 운영 환경에서도 정상적으로 서빙되어야 합니다.
-- 인증, 게임 기록, 랭킹 조회 기능이 외부 환경에서도 동일하게 동작해야 합니다.
+- 사용자는 Vercel에서 제공하는 퍼블릭 URL을 통해 서비스에 접속합니다.
+- Django 서버는 Vercel의 Serverless Functions 또는 Edge Runtime을 활용하여 배포됩니다.
+- 데이터베이스는 클라우드 기반의 Supabase(PostgreSQL)를 사용하여 영속성과 안정성을 확보합니다. (기존 MySQL에서 PostgreSQL로의 전환 포함)
+- 정적 파일(CSS, JS, 이미지)은 Vercel의 CDN을 통해 전 세계에 최적화된 상태로 서빙됩니다.
+- 모든 기능(인증, 게임, 랭킹)은 Vercel + Supabase 환경에서도 로컬과 동일하게 작동해야 합니다.
 
-### 8.2 권장 운영 아키텍처
-운영 환경에서는 다음과 같은 구조를 권장합니다.
+### 8.2 권장 운영 아키텍처 (Vercel + Supabase)
+효율적인 비용과 관리를 위해 다음과 같은 서버리스 아키텍처를 구성합니다.
 
-- **사용자(Client)** → **도메인 또는 EC2 퍼블릭 주소**
-- **Nginx** → 외부 HTTP/HTTPS 요청 수신 및 정적 파일 서빙
-- **Gunicorn + Django** → 실제 애플리케이션 실행
-- **AWS RDS(MySQL)** → 운영 데이터베이스
-- **EC2** → 애플리케이션 서버 인스턴스
+- **사용자(Client)** → **Vercel URL (HTTPS)**
+- **Vercel (Compute)** → Django 애플리케이션 실행 (Runtime 환경)
+- **Supabase (Database)** → PostgreSQL 운영 데이터베이스 (Managed 서비스)
+- **GitHub** → CI/CD 자동 배포 (Main 브랜치 Push 시 Vercel 자동 빌드)
 
-즉, 단순히 `runserver`로 띄우는 방식이 아니라,  
-**Nginx + Gunicorn + Django + RDS** 구조로 운영 배포를 구성해야 합니다.
+즉, 복잡한 인프라 관리(EC2, Nginx 설정 등) 없이 **Vercel + Supabase** 조합으로 기동성 있는 운영 배포를 구성합니다.
 
 ### 8.3 외부 접근을 위한 필수 설정
 외부 접속이 가능하려면 아래 항목이 반드시 반영되어야 합니다.
 
 #### (1) ALLOWED_HOSTS 설정
-- Django의 `settings.py`에 EC2 퍼블릭 IP, 도메인 주소를 등록해야 합니다.
-- 예:
-  - EC2 퍼블릭 IP
-  - Elastic IP
-  - 연결된 도메인 주소
+- Django의 `settings.py`에 Vercel에서 할당받은 도메인과 로컬 호스트를 등록합니다.
 
 #### (2) DEBUG 비활성화
-- 운영 환경에서는 `DEBUG = False`로 설정해야 합니다.
-- 디버그 정보 노출 방지 및 보안 강화를 위해 필수입니다.
+- 운영 환경(`.env` 활용)에서는 `DEBUG = False`로 설정해야 합니다.
 
-#### (3) 정적 파일 수집 및 서빙
-- `collectstatic` 수행 후 Nginx가 정적 파일을 서빙하도록 구성해야 합니다.
-- 현재 Premium CSS 시스템을 운영 환경에서도 그대로 사용하려면 정적 파일 경로 설계가 명확해야 합니다.
+#### (3) 정적 파일 수집 및 WhiteNoise 활용
+- Vercel 환경에서 Django 정적 파일을 서빙하기 위해 `WhiteNoise` 라이브러리를 적용하거나 Vercel 설정을 최적화합니다.
 
-#### (4) 데이터베이스 분리
-- 로컬 Docker MySQL은 개발용으로 사용하고,
-- 운영 환경은 AWS RDS MySQL로 분리해야 합니다.
-- 환경별 DB 설정을 분리하여 개발/운영 혼선을 방지해야 합니다.
+#### (4) 데이터베이스 마이그레이션 (MySQL → PostgreSQL)
+- 로컬 개발은 MySQL을 유지할 수 있으나, Supabase 사용을 위해 `psycopg2-binary` 라이브러리를 설치하고 PostgreSQL 호환성을 확보합니다.
+- 운영 환경의 `DATABASES` 설정을 Supabase 연결 정보로 업데이트합니다.
 
 #### (5) 보안 그룹(Security Group) 설정
 - EC2:
@@ -121,14 +113,13 @@ python-web-sql/
   - 3306 포트는 EC2에서만 접근 가능하도록 제한해야 합니다.
   - 외부 공개는 지양합니다.
 
-### 8.4 HTTPS 및 도메인 연결
-운영 서비스로 배포할 경우, 단순 퍼블릭 IP 접속보다 도메인 및 HTTPS 적용이 권장됩니다.
+### 8.4 HTTPS 및 도메인 자동화
+Vercel을 사용하면 별도의 설정 없이 SSL(HTTPS)이 자동 적용됩니다.
 
-- **도메인 연결**: Route 53 또는 외부 도메인 서비스 사용 가능
-- **HTTPS 인증서 적용**:
-  - Nginx + Certbot
-  - 또는 AWS Load Balancer + ACM 방식 검토 가능
+- **도메인**: Vercel 기본 주소(`*.vercel.app`) 사용 또는 커스텀 도메인 간편 연결.
+- **SSL**: Let's Encrypt를 통한 자동 갱신 및 보안 연결.
 
+이를 통해 별도의 Nginx 인증서 작업 없이 안전한 세션 처리가 가능합니다.
 이를 통해 로그인 기능 및 세션 처리 시 보안성을 강화할 수 있습니다.
 
 ### 8.5 운영 환경 설정 분리
@@ -145,19 +136,15 @@ python-web-sql/
 
 환경 변수(.env)를 사용하여 민감 정보와 운영 설정을 코드에서 분리하는 방식을 권장합니다.
 
-### 8.6 배포 절차 초안
-운영 배포는 아래 순서로 진행합니다.
-
-1. AWS EC2 인스턴스 생성
-2. AWS RDS MySQL 인스턴스 생성
-3. EC2에 Docker, Docker Compose, Nginx, Gunicorn 환경 구성
-4. 프로젝트 소스 배포 및 환경 변수 설정
-5. Django migration 수행
-6. `collectstatic` 수행
-7. Gunicorn 실행
-8. Nginx reverse proxy 연결
-9. 퍼블릭 IP 또는 도메인으로 외부 접속 확인
-10. 로그인, 게임 플레이, 랭킹 조회 정상 동작 검증
+### 8.6 배포 절차 초안 (Vercel + Supabase)
+1. Supabase 프로젝트 생성 및 PostgreSQL 데이터베이스 준비
+2. `settings.py`를 PostgreSQL 대응으로 수정 (dj-database-url 등 검토)
+3. Vercel 프로젝트 생성 및 GitHub 저장소 연결
+4. 환경 변수 등록 (`SECRET_KEY`, `DATABASE_URL`, `DEBUG=False` 등)
+5. Vercel 빌드 설정 (`vercel.json` 구성 및 Django 런타임 설정)
+6. 데이터베이스 Migration 수행 (Vercel Build step 또는 로컬 원격 접속)
+7. Vercel 배포 완료 및 퍼블릭 URL 접속 확인
+8. 로그인 및 게임 기능 최종 검증
 
 ### 8.7 운영 검증 체크리스트
 외부 공개 전 아래 항목을 점검해야 합니다.
@@ -172,14 +159,12 @@ python-web-sql/
 - 새로고침/직접 URL 접근 시 오류 여부
 - EC2 재시작 이후 서비스 자동 복구 여부
 
-### 8.8 추후 확장 가능 항목
-운영 안정성을 높이기 위해 아래 항목도 추후 반영 가능성이 있습니다.
+### 8.8 향후 과제 (AWS 및 고도화)
+사용자 증가 및 복잡한 아키텍처 요구 시 나중에 검토할 항목들입니다.
 
-- CI/CD 자동 배포(GitHub Actions)
-- CloudWatch 로그 모니터링
-- S3 기반 정적 파일 또는 미디어 파일 저장
-- AWS ALB 도입
-- 장애 대응 및 DB 백업 정책
-- 사용자 증가 대응을 위한 인스턴스 스케일 업/아웃
+- **AWS 마이그레이션**: EC2, RDS, S3 기반의 아키텍처로 확장
+- **CI/CD 고도화**: GitHub Actions를 통한 정교한 배포 파이프라인
+- **성능 모니터링**: CloudWatch 또는 외부 APM 도구 도입
+- **데이터 백업 및 복구**: 엔터프라이즈급 DB 관리 정책 수립
 
-*본 계획서는 현재 구현 상태를 반영한 최신 통합 계획서이며, AWS 운영 배포 및 외부 접근 검증 단계가 후속으로 진행됩니다.*
+*본 계획서는 Vercel 및 Supabase를 활용한 신속한 배포 전략을 우선순위에 두며, AWS 관련 업데이트는 향후 필요 시 진행합니다.*
