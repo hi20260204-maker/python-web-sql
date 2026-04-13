@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}RPS Ranking - 상위 100인{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ranking-header-card {
+        padding: 50px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .table-premium {
+        color: #cbd5e1;
+    }
+
+    .table-premium thead th {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding-bottom: 25px;
+    }
+
+    .table-premium tbody tr {
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .table-premium tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .rank-cell {
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
+        font-size: 1.3rem;
+    }
+
+    .crown { font-size: 1.5rem; margin-right: 10px; }
+    .gold { color: #facc15; }
+    .silver { color: #e2e8f0; }
+    .bronze { color: #fb923c; }
+
+    .stat-badge {
+        background: rgba(14, 165, 233, 0.15);
+        color: var(--primary);
+        padding: 6px 16px;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border: 1px solid rgba(14, 165, 233, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="ranking-header-card glass-card">
+            <h1 class="display-4 fw-800 mb-3 gradient-text">HALL OF FAME</h1>
+            <p class="text-secondary mb-0">최근 {{ days }}일 동안 전장을 지배한 최고의 전사들입니다.</p>
+        </div>
+
+        <div class="glass-card overflow-hidden">
+            <div class="table-responsive p-4">
+                <table class="table table-premium mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center" width="15%">Rank</th>
+                            <th>Warrior</th>
+                            <th class="text-center">Victories</th>
+                            <th class="text-center">Win Ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rank_user in rankings %}
+                        <tr class="hover-lift">
+                            <td class="text-center rank-cell">
+                                {% if forloop.counter == 1 %}<span class="crown">🥇</span><span class="gold">1st</span>
+                                {% elif forloop.counter == 2 %}<span class="crown">🥈</span><span class="silver">2nd</span>
+                                {% elif forloop.counter == 3 %}<span class="crown">🥉</span><span class="bronze">3rd</span>
+                                {% else %}<span class="text-secondary opacity-50">#{{ forloop.counter }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm me-3 bg-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">👤</div>
+                                    <div>
+                                        <div class="fw-bold">{{ rank_user.username }}</div>
+                                        {% if rank_user == user %}<span class="badge bg-primary" style="font-size: 0.6rem;">ME</span>{% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="h4 fw-800 text-white">{{ rank_user.win_count }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="stat-badge">{{ rank_user.profile.win_rate }}%</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <i class="text-secondary">아직 기록된 매치가 없습니다.</i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-5 text-center">
+            <a href="/game/" class="btn-premium">지금 전장에 참여하기</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

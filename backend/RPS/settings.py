@@ -62,7 +62,7 @@ ROOT_URLCONF = 'RPS.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,6 +128,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# 프로젝트 공통 정적 파일 디렉토리 설정
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# 운영 환경 배포 시 정적 파일이 수집될 경로
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

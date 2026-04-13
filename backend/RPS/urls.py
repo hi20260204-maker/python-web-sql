@@ -22,7 +22,8 @@ from ranking import views as ranking_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/', user_views.index),
-    path('game/', game_views.index),
-    path('ranking/', ranking_views.index),
+    path('', game_views.home, name='home'),
+    path('user/', user_views.index, name='user-index'),
+    path('game/', game_views.index, name='game-index'),
+    path('ranking/', ranking_views.index, name='ranking-index'),
 ]

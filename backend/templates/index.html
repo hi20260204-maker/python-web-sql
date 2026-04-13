@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}RPS Game - 전설의 전장이 당신을 기다립니다{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 5rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+        line-height: 1.1;
+    }
+
+    .feature-card {
+        padding: 30px;
+        height: 100%;
+        text-align: center;
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .animate-float {
+        animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title gradient-text animate-float">BATTLE OF THE<br>HANDS</h1>
+            <p class="lead text-secondary fs-4 mb-5">
+                가위, 바위, 보 중 단 하나를 선택하여 인공지능과 대결하고<br>
+                전설의 랭킹 보드에 이름을 올리세요.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/game/" class="btn-premium px-5 py-3 fs-5">지금 대결 시작 🚀</a>
+                <a href="/ranking/" class="btn btn-outline-light px-5 py-3 rounded-pill border-2 fw-bold">순위 확인하기</a>
+            </div>
+        </section>
+
+        <!-- Feature Grid -->
+        <div class="row g-4 mt-5">
+            <div class="col-md-4">
+                <div class="feature-card glass-card hover-lift">
+                    <span class="feature-icon">⚡</span>
+                    <h5 class="fw-bold">초고속 엔진</h5>
+                    <p class="text-secondary small">지연 없는 승패 판정과 즉각적인 데이터 반영을 경험하세요.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card glass-card hover-lift">
+                    <span class="feature-icon">🛡️</span>
+                    <h5 class="fw-bold">보안 및 정합성</h5>
+                    <p class="text-secondary small">모든 판정은 서버사이드에서 안전하게 이루어집니다.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card glass-card hover-lift">
+                    <span class="feature-icon">📊</span>
+                    <h5 class="fw-bold">정밀 통계</h5>
+                    <p class="text-secondary small">승률, 연승 등 상세한 데이터를 기반으로 자신을 분석하세요.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        {% if not user.is_authenticated %}
+        <div class="mt-5 p-5 glass-card text-center">
+            <h3 class="fw-bold mb-3">전적을 영구적으로 저장하고 싶나요?</h3>
+            <p class="text-secondary mb-4">관리자 페이지를 통해 로그인하거나 직접 가입하여 본인만의 기록을 쌓으세요.</p>
+            <a href="/admin/" class="btn btn-primary rounded-pill px-4">로그인하기</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
